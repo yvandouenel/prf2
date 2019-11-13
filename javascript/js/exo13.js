@@ -12,16 +12,32 @@ class Personne {
         this.nom = nom;
         this.prenom = prenom;        
     }
-    sePresenter(intro){
-        console.log(intro, this.nom , this.prenom);
+    sePresenter(){
+        console.log("Je suis" , this.prenom, this.nom);
     }
 }
 
 const jules = new Personne("Dupont", "Jules");
 const benoit = new Personne("Durand", "Benoit");
-jules.sePresenter("Je suis");
-benoit.sePresenter("I'm");
-console.log(benoit);
+jules.sePresenter();
+benoit.sePresenter();
+console.log(jules);
+
+class Guerrier extends Personne {
+    constructor(nom, prenom, arme) {
+        super(nom, prenom);
+        this.arme = arme;
+    }
+    lancerHache() {
+        console.log('Je te lance ma', this.arme, "mother fucker!!!");
+    }
+}
+const crom = new Guerrier("Crane", "Crom", "Hache");
+crom.sePresenter();
+crom.lancerHache();
+console.log(crom);
+
+const ajouter = (a,b) => { return a + b;};
 
 
 
