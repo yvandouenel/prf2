@@ -1,0 +1,11 @@
+#slideshow{
+    width: 800px;
+    height: 450px;
+    border: 1px solid red;
+    position: relative;
+}
+#slideshow > img {
+    position: absolute;
+    top: 0;
+    left: 0;                       
+}
