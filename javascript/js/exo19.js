@@ -5,9 +5,19 @@
 // ex, pour le premier h2, on obtiendra <h2 id="h2-1">Titre 1</h2>
 // pour le premier p <p id="p-1">Lorem ipsum ...</p>
 
-const h2s = document.querySelectorAll(".open-close > h2");
-console.log(h2s);
+const children_section = document.querySelectorAll(".open-close > *");
 for(let i = 0; i < h2s.length; i ++) {
-    h2s[i].setAttribute("id","h2-" + (i + 1));
-    h2s[i].nextElementSibling.setAttribute("id","p-" + (i + 1));
+    h2s[i].setAttribute("id", "h2-" + (i + 1));
+    
+    const nextElem = h2s[i].nextElementSibling;
+    if (nextElem.tagName == "P") {
+        nextElem.setAttribute("id", "p-" + (i + 1));
+    }
+    
 }
+console.log(children_section);
+// const ps = document.querySelectorAll(".open-close > p");
+
+// for(const [i, pElt] of ps.entries()) {
+//     pElt.setAttribute("id", "p-" + (i + 1));
+// }

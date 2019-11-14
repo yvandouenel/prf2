@@ -1,0 +1,13 @@
+/* Position relative pour permettre aux enfants
+qui sont en position absolute de se référer à  #slideshow */
+#slideshow {
+    width: 400px;
+    height: 300px;
+    border: 1px solid black;
+    position: relative;
+}
+#slideshow img {
+    position: absolute; /* par rapport à #slideshow */
+    top: 0;
+    left: 0;
+}

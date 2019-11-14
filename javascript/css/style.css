@@ -1,0 +1,15 @@
+p {
+    height: 50px;
+    margin: 0 auto;
+    overflow: hidden;
+    transition: all 1s ease-in-out ;
+  }
+  
+p.hidden {
+    
+    height: 0px;
+    
+}
+  .visible {
+      display: block;
+  }
