@@ -11,3 +11,6 @@ qui sont en position absolute de se référer à  #slideshow */
     top: 0;
     left: 0;
 }
+#slideshow img:first-child {
+    z-index: 1;
+}

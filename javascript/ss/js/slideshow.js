@@ -19,6 +19,9 @@ window.onload = () => {
 
             // création des événements
             this.createEvents();
+
+            // timeout en cours
+            this.timeout;
         }
         // méthode de la class slideshow
         createImages() {
@@ -39,11 +42,12 @@ window.onload = () => {
             // si is_running est faux, alors, on le passe à true
             // et on relance this.slide()
             // si is_running est vrai, alorsn on le passe à false
-            this.ss_container.onclick = function() {
+            this.ss_container.onclick = () => {
                 console.log('click sur le container');
                 console.log(this);
                 if (this.is_running) {
                     this.is_running = false;
+                    window.clearTimeout(this.timeout);
                 } else {
                     this.is_running = true;
                     this.slide();
@@ -54,14 +58,14 @@ window.onload = () => {
         // on fait tourner le bazar
         slide() {
             if (this.is_running) {
-                setTimeout(() => {
+                this.timeout = setTimeout(() => {
                     // récupération de la première image
                     const first_image = document.querySelector("#slideshow > img");
                     // placement de la première image comme dernier fils de ss_container
                     this.ss_container.appendChild(first_image);
                     // appel récursif !!!
                     this.slide();
-                }, 2000);
+                }, 500);
             }
         }
     }
