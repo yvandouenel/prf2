@@ -5,34 +5,38 @@ class ManageImages {
         // appel assynchrone de fetchImages 
         this.fetchImages(this.createFigures);
 
-        // appel de la méthode d'ajout des événements
+        // appel de la méthode d'ajout d'un événement
         this.addEventOnSelect();
+
+        // appel de la méthode d'ajout d'un événement
+        this.addEventOnInput();
     }
     // création des figures
-    createFigures = () => {
+    createFigures = (images = this.images) => {
         //console.log('Dans createFigures');
-        for (let i = 0; i < this.images.length; i++) {
+        console.log("tableau d'images à créer : ", images);
+        for (let i = 0; i < images.length; i++) {
             const figure = document.createElement("figure");
             this.container.appendChild(figure);
             // création de l'image et insertion dans la balise figure
-            this.createImage(i,figure);
+            this.createImage(i, figure, images);
             // création des figcaption et insertion dans la balise figure
-            this.createFigCaption(i,figure);
+            this.createFigCaption(i, figure, images);
         }
     }
     //création d'une image à placer dans une balise figure
-    createImage = (index, figure) => {
+    createImage = (index, figure, images) => {
         //console.log('Dans createImage');
         const img = document.createElement("img");
-        img.setAttribute("src", this.images[index].download_url);
+        img.setAttribute("src", images[index].download_url);
         figure.appendChild(img);
     }
     // création d'un "figcaption"
-    createFigCaption = (index, figure) => {
+    createFigCaption = (index, figure, images) => {
         //console.log('Dans createFigCaption');
         const figcaption = document.createElement("figcaption");
         // on écrit le texte correspondant à l'auteur dans le figcaption
-        figcaption.textContent = this.images[index].author;
+        figcaption.textContent = images[index].author;
         figure.appendChild(figcaption);
     }
     // appeler les images avec un callback de succès
@@ -57,6 +61,38 @@ class ManageImages {
             })
         
     }
+    // gestion de l'événement oninput sur l'input autor
+    addEventOnInput = () => {
+        console.log('Dans addEventOnInput');
+        const input_author = document.getElementById("author");
+        input_author.oninput = (e) => {
+            console.log('dans oninput de author');
+            console.log('this.images', this.images);
+            const input_author_value = input_author.value.toLowerCase()
+            
+            // reduction du tableau grâce à include et filter
+            console.log('contient : ', input_author_value);
+
+            const filteredImages = this.images.filter(img =>  {
+                return img.author.toLowerCase().includes(input_author_value)}
+            );
+            
+            // effacement des images
+            this.removeImages();
+
+            // Création des images
+            this.createFigures(filteredImages);
+        }
+    }
+    // effacement des images 
+    removeImages = () => {
+        // efface les éléments du dom qui correspondent à des figures
+        const figures = document.querySelectorAll('figure');
+               
+        for(const figure of figures) {
+            figure.parentNode.removeChild(figure);
+        }
+    }
     // gestion de l'événement onchange sur le select
     addEventOnSelect = () => {
         console.log('Dans addEventOnSelect');
@@ -70,12 +106,10 @@ class ManageImages {
             // test si la valeur est bien "author"
             if (value_option === "author") {
                 console.log('value_option : ', value_option);
-                // efface les éléments du dom qui correspondent à des figures
-                const figures = document.querySelectorAll('figure');
-               
-                for(const figure of figures) {
-                    figure.parentNode.removeChild(figure);
-                }
+
+                // effacement des images
+                this.removeImages();
+                
                 // Tri du tableau des images en fonction des auteurs
                 function compare( a, b ) {
                     if ( a.author < b.author ){
