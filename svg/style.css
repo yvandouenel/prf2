@@ -1,0 +1,43 @@
+svg text {
+  stroke: #000066;
+  stroke-width: 0;
+  transition-property: stroke-width;
+  transition-duration: 2s;
+  transition-timing-function: linear;
+  transition-delay: 1s;
+}
+svg text:hover {
+  stroke-width: 3px;
+}
+#rect {
+  transition-property: fill;
+  transition-duration: 1s;
+  transition-timing-function: linear;
+  transition-delay: 0.2s;
+}
+#rect:hover {
+  fill: transparent;
+}
+.path {
+  stroke-width: 3px;
+  stroke: #000066;
+  /* animation: dash 5s linear alternate infinite; */
+  animation: border 5s linear alternate infinite;
+}
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes border {
+  from {
+    stroke-width: 0;
+  }
+  to {
+    stroke-width: 20px;
+  }
+}
