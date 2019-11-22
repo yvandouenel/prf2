@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import Nav from "./components/Nav";
 import Fetch from "./services/Fetch";
 import Column from "./components/Column";
-
 import "./App.css";
 
 class App extends Component {
   state = {
     terms: [],
-    columns: []
+    columns: [],
+    editingCard: false
   };
   fetch = {};
 
@@ -18,6 +18,41 @@ class App extends Component {
     this.fetch = new Fetch("http://www.coopernet.fr/");
     // on va chercher le token
     this.fetch.getToken(this.successToken, this.failureToken);
+  };
+  handleSubmit = event => {
+    event.preventDefault();
+  };
+  handleChangeQuestion = event => {
+    console.log("dans handleChangeQuestion");
+  };
+  // affichage du formulaire
+  dumpForm = () => {
+    if (this.state.editingCard) {
+      console.log("Affichage du formulaire");
+    } else {
+      console.log("Pas de formulaire");
+    }
+    if (false) {
+      return (
+        <form action="" onSubmit={this.handleSubmit}>
+          <label htmlFor="question">
+            Question
+            <input
+              value={this.state.columns[0].cartes[0].question}
+              onChange={this.handleChangeQuestion}
+              type="text"
+              id="question"
+            />
+          </label>
+          <label htmlFor="reponse">
+            Réponse
+            <input type="text" id="reponse" />
+          </label>
+
+          <input type="submit" value="Envoyer" />
+        </form>
+      );
+    }
   };
   // En cas de succès de getToken
   successToken = data => {
@@ -47,18 +82,37 @@ class App extends Component {
   failureTerms = error => {
     console.log("Erreur attrapée : ", error);
   };
+  handleEditCard = (e, card) => {
+    console.log("Dans handleEditCard");
+    console.log("carte concernée ", card);
+    // copie du state
+    const copy_state = { ...this.state };
+    // Modification de la copie du state
+    copy_state.editingCard = card;
 
-  handleClickTerm = (e, term_id) => {
+    this.setState(copy_state);
+  };
+
+  handleClickTerm = (e, term) => {
     console.log("Dans handleClickTerm");
     // Modification de la propriété selected
     // du term concerné
     // copie du state
     const copy_state = { ...this.state };
+    // Recherche de l'index du term
+    const index_term = copy_state.terms.indexOf(term);
+    // On donne la valeur false à tous les term.selected
+    for (const term of copy_state.terms) {
+      term.selected = false;
+    }
     // modification de la copie du state
-    copy_state.terms[0].selected = true;
-    this.setState(copy_state);
+    copy_state.terms[index_term].selected = true;
+
     // appel de la méthode qui récupère les cartes
-    this.fetch.createReqCards(term_id, this.successCards, this.failureCards);
+    this.fetch.createReqCards(term.id, this.successCards, this.failureCards);
+
+    // changement du state
+    this.setState(copy_state);
   };
   successCards = data => {
     console.log("Dans successCards");
@@ -86,8 +140,15 @@ class App extends Component {
         </header>
         <main className="container-fluid">
           <div className="row">
+            {this.dumpForm()}
             {this.state.columns.map(column => {
-              return <Column key={column.id} column={column} />;
+              return (
+                <Column
+                  onClickEditCard={this.handleEditCard}
+                  key={column.id}
+                  column={column}
+                />
+              );
             })}
           </div>
         </main>

@@ -8,7 +8,13 @@ class Column extends Component {
       <section className="col-md-3">
         <h2>{this.props.column.name}</h2>
         {this.props.column.cartes.map(card => {
-          return <Card key={card.id} card={card} />;
+          return (
+            <Card
+              onClickEditCard={this.props.onClickEditCard}
+              key={card.id}
+              card={card}
+            />
+          );
         })}
       </section>
     );

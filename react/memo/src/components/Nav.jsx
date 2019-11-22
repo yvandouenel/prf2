@@ -17,7 +17,7 @@ class Nav extends Component {
             <li
               onClick={e => {
                 console.log("onClick sur term ", term.id);
-                this.props.onClickTerm(e, term.id);
+                this.props.onClickTerm(e, term);
               }}
               className={this.buttonClasses(term.selected)}
               key={term.id}
