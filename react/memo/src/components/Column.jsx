@@ -7,6 +7,14 @@ class Column extends Component {
     return (
       <section className="col-md-3">
         <h2>{this.props.column.name}</h2>
+        <button
+          onClick={e => {
+            console.log("colonne index : ", this.props.column_index);
+            this.props.onClickAddCard(e, this.props.column_index);
+          }}
+        >
+          Ajouter
+        </button>
         {this.props.column.cartes.map(card => {
           return (
             <Card

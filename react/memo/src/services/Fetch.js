@@ -115,7 +115,76 @@ class Fetch {
       console.log("Pb getCards - Statut : ", req.status, req.statusText);
     }
   };
-
+  createReqAddCard = (
+    question,
+    reponse,
+    themeid,
+    columnid,
+    callbackSuccess,
+    callbackFailed
+  ) => {
+    console.log("Dans createReqAddCards de Fetch");
+    // création de la requête
+    // utilisation de fetch
+    fetch(this.url_basis + "node?_format=hal_json", {
+      // permet d'accepter les cookies ?
+      credentials: "same-origin",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/hal+json",
+        "X-CSRF-Token": this.token,
+        Authorization: "Basic " + btoa(this.login + ":" + this.pwd) // btoa = encodage en base 64
+      },
+      body: JSON.stringify({
+        _links: {
+          type: {
+            href: this.url_basis + "rest/type/node/carte"
+          }
+        },
+        title: [
+          {
+            value: question
+          }
+        ],
+        field_carte_question: [
+          {
+            value: question
+          }
+        ],
+        field_carte_reponse: [
+          {
+            value: reponse
+          }
+        ],
+        field_carte_colonne: [
+          {
+            target_id: columnid,
+            url: "/taxonomy/term/" + columnid
+          }
+        ],
+        field_carte_thematique: [
+          {
+            target_id: themeid,
+            url: "/taxonomy/term/" + themeid
+          }
+        ],
+        type: [
+          {
+            target_id: "carte"
+          }
+        ]
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log("data reçues le :", data.created[0].value);
+        if (data.created[0].value) {
+          callbackSuccess(themeid);
+        } else {
+          callbackFailed("Erreur de login ou de mot de passe");
+        }
+      });
+  };
   createReqEditCard = (card, themeid, callbackSuccess, callbackFailed) => {
     console.log("Dans createReqEditCard de Fetch");
     // destructuring object

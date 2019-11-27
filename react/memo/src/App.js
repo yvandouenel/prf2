@@ -8,7 +8,8 @@ class App extends Component {
   state = {
     terms: [],
     columns: [],
-    editing_card: false
+    editing_card: false,
+    adding_card_in_column: null
   };
   fetch = {};
 
@@ -24,24 +25,63 @@ class App extends Component {
     event.preventDefault();
     // copie du state
     const copy_state = { ...this.state };
+
+    //changement de la copie du state
     copy_state.editing_card = false;
-    // Récupération des infos concernant la carte en cours d'édition
-    // destructuring object
-    const { column_index, card_index } = this.state.editing_card;
-    const card = this.state.columns[column_index].cartes[card_index];
-    // on va chercher le term qui a pour propriété selected à true
+    copy_state.adding_card_in_column = null;
     const term_index = this.state.terms.findIndex(
       term => term.selected === true
     );
-    // sauvegarde des données sur le serveur
-    this.fetch.createReqEditCard(
-      card,
-      this.state.terms[term_index].id,
-      this.successEditCard,
-      this.failureEditCard
-    );
+    // Récupération des infos concernant la carte en cours d'édition
 
-    this.setState(copy_state);
+    // Teste si on est en train de modifier ou d'ajouter
+    if (this.state.editing_card) {
+      // destructuring object
+      const { column_index, card_index } = this.state.editing_card;
+      const card = this.state.columns[column_index].cartes[card_index];
+      // on va chercher le term qui a pour propriété selected à true
+
+      // sauvegarde des données sur le serveur
+      this.fetch.createReqEditCard(
+        card,
+        this.state.terms[term_index].id,
+        this.successEditCard,
+        this.failureEditCard
+      );
+
+      this.setState(copy_state);
+    } else {
+      const question = document.getElementById("question").value;
+      const reponse = document.getElementById("reponse").value;
+      const term_id = this.state.terms[term_index].id; //ok
+      const column_id = this.state.adding_card_in_column; //pb
+      console.log(
+        "Ajout carte question, réponse, term_id, column_id",
+        question,
+        reponse,
+        term_id,
+        column_id
+      );
+      // enregistrement de la nouvelle carte sur le serveur
+      this.fetch.createReqAddCard(
+        question,
+        reponse,
+        term_id,
+        column_id,
+        this.successAddCard,
+        this.failureAddCard
+      );
+
+      this.setState(copy_state);
+    }
+  };
+  successAddCard = () => {
+    console.log("Dans successAddCard");
+    // appel de la méthode qui récupère les cartes
+    //this.fetch.createReqCards(term.id, this.successCards, this.failureCards);
+  };
+  failureAddCard = () => {
+    console.log("Dans failureAddCard");
   };
   successEditCard = () => {
     console.log("Dans successEditCard");
@@ -65,37 +105,46 @@ class App extends Component {
 
   // affichage du formulaire
   dumpForm = () => {
-    if (this.state.editing_card) {
+    if (this.state.editing_card || this.state.adding_card_in_column != null) {
       console.log("Affichage du formulaire");
       // destructuring object
       const { column_index, card_index } = this.state.editing_card;
+
+      // teste si le formulaire doit modifier ou ajouter
+      // en fonction de cela les inputs ne sont pas les mêmes
+      const input_question = this.state.editing_card ? (
+        <input
+          value={this.state.columns[column_index].cartes[card_index].question}
+          onChange={e => {
+            this.handleChangeQuestionReponse(e, "question");
+          }}
+          type="text"
+          id="question"
+        />
+      ) : (
+        <input type="text" id="question" />
+      );
+      const input_reponse = this.state.editing_card ? (
+        <input
+          value={this.state.columns[column_index].cartes[card_index].reponse}
+          onChange={e => {
+            this.handleChangeQuestionReponse(e, "reponse");
+          }}
+          type="text"
+          id="reponse"
+        />
+      ) : (
+        <input type="text" id="reponse" />
+      );
       return (
         <form action="" onSubmit={this.handleSubmit}>
           <label htmlFor="question">
             Question
-            <input
-              value={
-                this.state.columns[column_index].cartes[card_index].question
-              }
-              onChange={e => {
-                this.handleChangeQuestionReponse(e, "question");
-              }}
-              type="text"
-              id="question"
-            />
+            {input_question}
           </label>
           <label htmlFor="reponse">
             Réponse
-            <input
-              value={
-                this.state.columns[column_index].cartes[card_index].reponse
-              }
-              onChange={e => {
-                this.handleChangeQuestionReponse(e, "reponse");
-              }}
-              type="text"
-              id="reponse"
-            />
+            {input_reponse}
           </label>
 
           <input type="submit" value="Envoyer" />
@@ -132,6 +181,15 @@ class App extends Component {
   };
   failureTerms = error => {
     console.log("Erreur attrapée : ", error);
+  };
+  handleAddCard = (e, column_index) => {
+    console.log("Dans handleAddCard");
+    // copie du state
+    const copy_state = { ...this.state };
+    copy_state.adding_card_in_column = copy_state.columns[column_index].id;
+    console.log("Colonne id : ", copy_state.adding_card_in_column);
+
+    this.setState(copy_state);
   };
   handleEditCard = (e, column_index, card_index) => {
     console.log("Dans handleEditCard");
@@ -201,6 +259,7 @@ class App extends Component {
               return (
                 <Column
                   onClickEditCard={this.handleEditCard}
+                  onClickAddCard={this.handleAddCard}
                   key={column.id}
                   column={column}
                   column_index={this.state.columns.indexOf(column)}
