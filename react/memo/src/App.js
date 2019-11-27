@@ -8,7 +8,7 @@ class App extends Component {
   state = {
     terms: [],
     columns: [],
-    editingCard: false
+    editing_card: false
   };
   fetch = {};
 
@@ -20,38 +20,89 @@ class App extends Component {
     this.fetch.getToken(this.successToken, this.failureToken);
   };
   handleSubmit = event => {
+    console.log("dans handleSubmit");
     event.preventDefault();
+    // copie du state
+    const copy_state = { ...this.state };
+    copy_state.editing_card = false;
+    // Récupération des infos concernant la carte en cours d'édition
+    // destructuring object
+    const { column_index, card_index } = this.state.editing_card;
+    const card = this.state.columns[column_index].cartes[card_index];
+    // on va chercher le term qui a pour propriété selected à true
+    const term_index = this.state.terms.findIndex(
+      term => term.selected === true
+    );
+    // sauvegarde des données sur le serveur
+    this.fetch.createReqEditCard(
+      card,
+      this.state.terms[term_index].id,
+      this.successEditCard,
+      this.failureEditCard
+    );
+
+    this.setState(copy_state);
   };
-  handleChangeQuestion = event => {
-    console.log("dans handleChangeQuestion");
+  successEditCard = () => {
+    console.log("Dans successEditCard");
   };
+  failureEditCard = () => {
+    console.log("Dans failureEditCard");
+  };
+  handleChangeQuestionReponse = (event, qr) => {
+    console.log("dans handleChangeQuestionReponse");
+    // copie du state
+    const copy_state = { ...this.state };
+    // destructuring object
+    const { column_index, card_index } = this.state.editing_card;
+    // modification de la copie du state
+
+    copy_state.columns[column_index].cartes[card_index][qr] =
+      event.target.value;
+    // changement du state
+    this.setState(copy_state);
+  };
+
   // affichage du formulaire
   dumpForm = () => {
-    if (this.state.editingCard) {
+    if (this.state.editing_card) {
       console.log("Affichage du formulaire");
-    } else {
-      console.log("Pas de formulaire");
-    }
-    if (false) {
+      // destructuring object
+      const { column_index, card_index } = this.state.editing_card;
       return (
         <form action="" onSubmit={this.handleSubmit}>
           <label htmlFor="question">
             Question
             <input
-              value={this.state.columns[0].cartes[0].question}
-              onChange={this.handleChangeQuestion}
+              value={
+                this.state.columns[column_index].cartes[card_index].question
+              }
+              onChange={e => {
+                this.handleChangeQuestionReponse(e, "question");
+              }}
               type="text"
               id="question"
             />
           </label>
           <label htmlFor="reponse">
             Réponse
-            <input type="text" id="reponse" />
+            <input
+              value={
+                this.state.columns[column_index].cartes[card_index].reponse
+              }
+              onChange={e => {
+                this.handleChangeQuestionReponse(e, "reponse");
+              }}
+              type="text"
+              id="reponse"
+            />
           </label>
 
           <input type="submit" value="Envoyer" />
         </form>
       );
+    } else {
+      console.log("Pas de formulaire");
     }
   };
   // En cas de succès de getToken
@@ -82,14 +133,19 @@ class App extends Component {
   failureTerms = error => {
     console.log("Erreur attrapée : ", error);
   };
-  handleEditCard = (e, card) => {
+  handleEditCard = (e, column_index, card_index) => {
     console.log("Dans handleEditCard");
-    console.log("carte concernée ", card);
+    console.log("index de la colonne : ", column_index);
+    console.log("index de la carte : ", card_index);
+
     // copie du state
     const copy_state = { ...this.state };
     // Modification de la copie du state
-    copy_state.editingCard = card;
-
+    copy_state.editing_card = {
+      column_index: column_index,
+      card_index: card_index
+    };
+    console.log("editing_card : ", copy_state.editing_card);
     this.setState(copy_state);
   };
 
@@ -147,6 +203,7 @@ class App extends Component {
                   onClickEditCard={this.handleEditCard}
                   key={column.id}
                   column={column}
+                  column_index={this.state.columns.indexOf(column)}
                 />
               );
             })}

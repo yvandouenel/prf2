@@ -115,6 +115,73 @@ class Fetch {
       console.log("Pb getCards - Statut : ", req.status, req.statusText);
     }
   };
+
+  createReqEditCard = (card, themeid, callbackSuccess, callbackFailed) => {
+    console.log("Dans createReqEditCard de Fetch");
+    // destructuring object
+    const { id, question, reponse, colonne } = card;
+    console.log("n");
+    // création de la requête
+    // utilisation de fetch
+    fetch(this.url_basis + "node/" + id + "?_format=hal_json", {
+      // permet d'accepter les cookies ?
+      credentials: "same-origin",
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/hal+json",
+        "X-CSRF-Token": this.token,
+        Authorization: "Basic " + btoa(this.login + ":" + this.pwd) // btoa = encodage en base 64
+      },
+      body: JSON.stringify({
+        _links: {
+          type: {
+            href: this.url_basis + "rest/type/node/carte"
+          }
+        },
+        title: [
+          {
+            value: question
+          }
+        ],
+        field_carte_question: [
+          {
+            value: question
+          }
+        ],
+        field_carte_reponse: [
+          {
+            value: reponse
+          }
+        ],
+        field_carte_colonne: [
+          {
+            target_id: colonne,
+            url: "/taxonomy/term/" + colonne
+          }
+        ],
+        field_carte_thematique: [
+          {
+            target_id: themeid,
+            url: "/taxonomy/term/" + themeid
+          }
+        ],
+        type: [
+          {
+            target_id: "carte"
+          }
+        ]
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log("data reçues :", data);
+        if (data) {
+          callbackSuccess(themeid);
+        } else {
+          callbackFailed("Erreur de login ou de mot de passe");
+        }
+      });
+  };
 }
 
 export default Fetch;

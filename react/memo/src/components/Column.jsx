@@ -13,6 +13,8 @@ class Column extends Component {
               onClickEditCard={this.props.onClickEditCard}
               key={card.id}
               card={card}
+              column_index={this.props.column_index}
+              card_index={this.props.column.cartes.indexOf(card)}
             />
           );
         })}
