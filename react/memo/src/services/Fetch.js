@@ -185,6 +185,50 @@ class Fetch {
         }
       });
   };
+  /**
+   * Remove a card
+   * @param  {number} num_card - id of the card to be deleted
+   * @param {function} callbackSuccess - The callback that handles the response.
+   * @param  {function } callbackFailed - function to call if error
+   * @returns {undefined}
+   */
+  removeCard = (num_card, callbackSuccess, callbackFailed) => {
+    console.log("dans removeCard - carte " + num_card);
+    // utilisation de fetch
+    fetch(this.url_basis + "node/" + num_card + "?_format=hal_json", {
+      // permet d'accepter les cookies ?
+      credentials: "same-origin",
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/hal+json",
+        "X-CSRF-Token": this.token,
+        Authorization: "Basic " + btoa(this.login + ":" + this.pwd) // btoa = encodage en base 64
+      },
+      body: JSON.stringify({
+        _links: {
+          type: {
+            href: this.url_basis + "rest/type/node/carte"
+          }
+        },
+
+        type: [
+          {
+            target_id: "carte"
+          }
+        ]
+      })
+    })
+      .then(response => response)
+      .then(data => {
+        console.log("data reçues:", data);
+        if (data.status === 204) {
+          callbackSuccess();
+        } else {
+          callbackFailed();
+        }
+      });
+  };
+
   createReqEditCard = (card, themeid, callbackSuccess, callbackFailed) => {
     console.log("Dans createReqEditCard de Fetch");
     // destructuring object
