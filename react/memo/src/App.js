@@ -75,10 +75,10 @@ class App extends Component {
       this.setState(copy_state);
     }
   };
-  successAddCard = () => {
+  successAddCard = term_id => {
     console.log("Dans successAddCard");
     // appel de la méthode qui récupère les cartes
-    //this.fetch.createReqCards(term.id, this.successCards, this.failureCards);
+    this.fetch.createReqCards(term_id, this.successCards, this.failureCards);
   };
   failureAddCard = () => {
     console.log("Dans failureAddCard");
